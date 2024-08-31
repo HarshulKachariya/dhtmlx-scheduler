@@ -1,5 +1,5 @@
 {
-  "name": "dhtmlx-scheduler",
+  "name": "dhtmlx-schedulers",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -14,11 +14,15 @@
     "@remix-run/node": "^2.11.2",
     "@remix-run/react": "^2.11.2",
     "@remix-run/serve": "^2.11.2",
+    "dhtmlx-scheduler": "^7.1.1",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-react": "^7.24.7",
     "@remix-run/dev": "^2.11.2",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",

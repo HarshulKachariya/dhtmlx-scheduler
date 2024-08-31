@@ -8,25 +8,21 @@
     "**/.client/**/*.tsx"
   ],
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "types": ["@remix-run/node", "vite/client"],
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "jsx": "react-jsx",
+    "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "resolveJsonModule": true,
-    "target": "ES2022",
-    "strict": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./app/*"]
-    },
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
 
-    // Vite takes care of building everything, not tsc.
-    "noEmit": true
-  }
+  "exclude": ["node_modules"]
 }
