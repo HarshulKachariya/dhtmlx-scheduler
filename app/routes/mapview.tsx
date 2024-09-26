@@ -46,7 +46,7 @@ const Scheduler: React.FC = () => {
       // Load the script of google map
       await new Promise<void>((resolve) => {
         const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAOXA_S8oo49DSr9CduSTDFjLSE7rO1KqU`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBVpjUB1Fvop_OWa9OzefIs7LP5gAisWq4`;
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
@@ -60,7 +60,7 @@ const Scheduler: React.FC = () => {
       // if have a current ref then load the scheduler
       if (schedulerContainer.current) {
         scheduler.init(schedulerContainer.current, new Date(), "month");
-        scheduler.parse(events, "json");
+        scheduler.parse(mapEvents, "json");
 
         // display diffrent colors of event
         scheduler.templates.event_class = function (
@@ -413,9 +413,6 @@ const Scheduler: React.FC = () => {
 
         // Scheduler map view API key
         scheduler.config.map_settings.accessToken =
-          "AIzaSyAOXA_S8oo49DSr9CduSTDFjLSE7rO1KqU";
-        // "AIzaSyBVpjUB1Fvop_OWa9OzefIs7LP5gAisWq4"; // developer purpose only
-        // "AIzaSyAOXA_S8oo49DSr9CduSTDFjLSE7rO1KqU"; live api key
       }
     };
 
@@ -434,7 +431,7 @@ const Scheduler: React.FC = () => {
   stylesheet();
 
   return (
-    <>
+    <div>
       <div className="controls w-full justify-center items-center flex gap-4">
         <div className="controls_buttons export-btn">
           <input
@@ -473,202 +470,8 @@ const Scheduler: React.FC = () => {
           <div className="dhx_cal_tab" data-tab="map"></div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
 export default Scheduler;
-
-// Map box provider
-// import React, { useEffect, useRef, useState } from "react";
-// import "dhtmlx-scheduler/codebase/dhtmlxscheduler.css";
-// import "../assets/scheduler.css";
-// import { events } from "../lib/data";
-
-// const Scheduler: React.FC = () => {
-//   const [toggle, setToggle] = useState<boolean>(false);
-//   const schedulerContainer = useRef<HTMLDivElement>(null);
-
-//   useEffect(() => {
-//     const loadScheduler = async () => {
-//       const scheduler: any = (await import("dhtmlx-scheduler")).default;
-
-//       // Load the Mapbox GL JS and CSS
-//       await new Promise<void>((resolve) => {
-//         const script = document.createElement("script");
-//         script.src = "https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js";
-//         script.async = true;
-//         script.onload = () => {
-//           const mapboxCSS = document.createElement("link");
-//           mapboxCSS.href =
-//             "https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css";
-//           mapboxCSS.rel = "stylesheet";
-//           document.head.appendChild(mapboxCSS);
-
-//           resolve();
-//         };
-//         document.head.appendChild(script);
-//       });
-
-//       scheduler.skin = toggle ? "dark" : "flat";
-
-//       // Update toggle button styles
-//       const toggleBtn = document.querySelector(
-//         ".styled_checkbox"
-//       ) as HTMLSelectElement;
-//       toggleBtn.style.backgroundColor = toggle ? "white" : "black";
-
-//       const btnColor = document.querySelector(
-//         ".styled_checkbox_button"
-//       ) as HTMLSelectElement;
-//       btnColor.style.backgroundColor = toggle ? "black" : "white";
-
-//       scheduler.config.day_date = "%D %F %j";
-
-//       if (schedulerContainer.current) {
-//         scheduler.plugins({
-//           quick_info: true, // info
-//           export_api: true, // pdf & png export
-//           map_view: true, // mapview
-//         });
-
-//         scheduler.locale.labels.map_tab = "Map";
-//         scheduler.config.map_view_provider = "mapbox";
-//         scheduler.config.mapbox_key =
-//           "pk.eyJ1IjoiYWwtZS04MTIiLCJhIjoiY2xzeGh5Y2s4MDM2YTJqbzNsbzNlMzRwciJ9.sDNoj9-d6_h-twEtvgqupQ"; // Replace with your Mapbox access token
-
-//         scheduler.config.map_settings = {
-//           initial_position: { lat: 48.724, lng: 8.215 },
-//           error_position: { lat: 15, lng: 15 },
-//           initial_zoom: 1,
-//           zoom_after_resolve: 15,
-//           info_window_max_width: 300,
-//           resolve_user_location: true,
-//           resolve_event_location: true,
-//           view_provider: "mapbox",
-//         };
-
-//         // Set up custom event styles
-//         scheduler.templates.event_class = function (
-//           start: any,
-//           end: any,
-//           ev: any
-//         ) {
-//           return ev.classname || "";
-//         };
-
-//         // Set up scheduler header
-//         scheduler.config.header = [
-//           "day",
-//           "week",
-//           "month",
-//           "map",
-//           "date",
-//           "prev",
-//           "today",
-//           "next",
-//         ];
-
-//         // Set up lightbox sections
-//         scheduler.config.lightbox.sections = [
-//           {
-//             name: "description",
-//             height: 50,
-//             map_to: "text",
-//             type: "textarea",
-//             focus: true,
-//           },
-//           {
-//             name: "location",
-//             height: 43,
-//             map_to: "event_location",
-//             type: "textarea",
-//           },
-//           { name: "time", height: 72, type: "time", map_to: "auto" },
-//         ];
-
-//         scheduler.locale.labels.section_location = "Location";
-
-//         // Attach the map click event handler
-//         scheduler.attachEvent("onMapClick", function (lat: any, lng: any) {
-//           const newEvent: object | any = {
-//             start_date: new Date(),
-//             end_date: new Date(new Date().getTime() + 60 * 60 * 1000), // 1-hour duration
-//             text: "New Event",
-//             event_location: { lat, lng }, // Set location based on clicked position
-//           };
-
-//           scheduler.addEvent(newEvent);
-//           scheduler.showLightbox(newEvent.id); // Optionally, show a lightbox for custom input
-//           return true;
-//         });
-
-//         scheduler.attachEvent("onMapViewLoaded", function () {
-//           console.log("Map view loaded");
-//           // Force redraw of the map
-//           setTimeout(() => {
-//             scheduler.setCurrentView();
-//           }, 100);
-//         });
-
-//         scheduler.config.map_settings.accessToken =
-//           "pk.eyJ1IjoiYWwtZS04MTIiLCJhIjoiY2xzeGh5Y2s4MDM2YTJqbzNsbzNlMzRwciJ9.sDNoj9-d6_h-twEtvgqupQ";
-
-//         // Initialize the Scheduler
-//         scheduler.init(schedulerContainer.current, new Date(), "map");
-//         scheduler.parse(events, "json");
-//       }
-//     };
-
-//     loadScheduler();
-
-//     return () => {
-//       import("dhtmlx-scheduler").then((module) => module.default.clearAll());
-//     };
-//   }, [toggle]);
-
-//   return (
-//     <>
-//       <div className="controls w-full justify-center items-center flex gap-4">
-//         <div className="controls_buttons export-btn">
-//           <input
-//             type="button"
-//             value="Export to PDF"
-//             name="pdf"
-//             className="bg-[#0288d1] text-white hover:bg-[#007cbf] cursor-pointer "
-//           />
-//           <input
-//             type="button"
-//             value="Export to PNG"
-//             name="png"
-//             className="bg-[#0288d1] text-white hover:bg-[#007cbf] cursor-pointer "
-//           />
-//         </div>
-//         <label className="flex items-center gap-3">
-//           <div className="flex gap-2 items-center">
-//             Light
-//             <div className="styled_checkbox">
-//               <input
-//                 name="padding-toggle"
-//                 type="checkbox"
-//                 onChange={() => setToggle(!toggle)}
-//               />
-//               <div className="styled_checkbox_button"></div>
-//             </div>{" "}
-//             Dark
-//           </div>
-//         </label>
-//       </div>
-//       <div
-//         ref={schedulerContainer}
-//         className="min-h-[94vh] min-w-[90%] dhx_cal_container"
-//       >
-//         <div className="dhx_cal_navline">
-//           <div className="dhx_cal_tab" data-tab="map"></div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default Scheduler;
