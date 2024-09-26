@@ -13,8 +13,19 @@ const Scheduler: React.FC = () => {
 
       // if have a current ref then load the scheduler
       if (schedulerContainer.current) {
+        await new Promise<void>((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBVpjUB1Fvop_OWa9OzefIs7LP5gAisWq4&libraries=places`;
+          script.async = true;
+          script.defer = true;
+          document.head.appendChild(script);
+
+          script.onload = () => resolve();
+          script.onerror = (e) => reject(e);
+        });
+
         scheduler.init(schedulerContainer.current, new Date(), "week");
-        scheduler.load(events);
+        scheduler.load(events, "json");
 
         // display diffrent colors of event
         scheduler.templates.event_class = function (
@@ -230,61 +241,60 @@ const Scheduler: React.FC = () => {
         }
 
         // Map View in Scheduler
+        scheduler.plugins({
+          map_view: true,
+        });
 
-        // scheduler.plugins({
-        //   map_view: true,
-        // });
+        scheduler.locale.labels.map_tab = "Map";
+        scheduler.locale.labels.section_location = "Location";
 
-        // scheduler.locale.labels.map_tab = "Map";
-        // scheduler.locale.labels.section_location = "Location";
+        scheduler.config.map_view_provider = "googleMap";
 
-        // scheduler.config.map_view_provider = "googleMap";
+        scheduler.config.map_settings = {
+          initial_position: {
+            lat: 48.724,
+            lng: 8.215,
+          },
+          error_position: {
+            lat: 15,
+            lng: 15,
+          },
+          initial_zoom: 1,
+          zoom_after_resolve: 15,
+          info_window_max_width: 300,
+          resolve_user_location: true,
+          resolve_event_location: true,
+          view_provider: "googleMap",
+        };
 
-        // scheduler.config.map_settings = {
-        //   initial_position: {
-        //     lat: 48.724,
-        //     lng: 8.215,
-        //   },
-        //   error_position: {
-        //     lat: 15,
-        //     lng: 15,
-        //   },
-        //   initial_zoom: 1,
-        //   zoom_after_resolve: 15,
-        //   info_window_max_width: 300,
-        //   resolve_user_location: true,
-        //   resolve_event_location: true,
-        //   view_provider: "googleMap",
-        // };
+        // updating dates to display on before view change
 
-        // // updating dates to display on before view change
+        scheduler.attachEvent(
+          "onBeforeViewChange",
+          function (
+            old_mode: any,
+            old_date: any,
+            new_mode: any,
+            new_date: any
+          ) {
+            scheduler.config.map_start = scheduler.date.month_start(
+              new Date((new_date || old_date).valueOf())
+            );
+            scheduler.config.map_end = scheduler.date.add(
+              scheduler.config.map_start,
+              1,
+              "month"
+            );
+            return true;
+          }
+        );
 
-        // scheduler.attachEvent(
-        //   "onBeforeViewChange",
-        //   function (
-        //     old_mode: any,
-        //     old_date: any,
-        //     new_mode: any,
-        //     new_date: any
-        //   ) {
-        //     scheduler.config.map_start = scheduler.date.month_start(
-        //       new Date((new_date || old_date).valueOf())
-        //     );
-        //     scheduler.config.map_end = scheduler.date.add(
-        //       scheduler.config.map_start,
-        //       1,
-        //       "month"
-        //     );
-        //     return true;
-        //   }
-        // );
+        // scheduler.init((events), new Date(2024, 5, 11), "map");
 
-        // // scheduler.init((events), new Date(2024, 5, 11), "map");
-
-        // // Scheduler map view API key
-        // scheduler.config.map_settings.accessToken =
-        //   "AIzaSyBVpjUB1Fvop_OWa9OzefIs7LP5gAisWq4"; // developer purpose only
-        // // "AIzaSyAOXA_S8oo49DSr9CduSTDFjLSE7rO1KqU"; live api key
+        // Scheduler map view API key
+        scheduler.config.map_settings.accessToken =
+          "AIzaSyBVpjUB1Fvop_OWa9OzefIs7LP5gAisWq4"; // developer purpose only
+        // "AIzaSyAOXA_S8oo49DSr9CduSTDFjLSE7rO1KqU"; live api key
       }
     };
 
