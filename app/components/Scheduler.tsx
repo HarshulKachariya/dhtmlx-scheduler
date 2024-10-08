@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import "dhtmlx-scheduler/codebase/dhtmlxscheduler.css";
 import "../assets/scheduler.css";
+import { events } from "../lib/data";
 
 const Scheduler: React.FC = () => {
   const schedulerContainer = useRef<HTMLDivElement>(null);
@@ -12,8 +13,6 @@ const Scheduler: React.FC = () => {
       const scheduler: any = (await import("dhtmlx-scheduler")).default;
 
       if (schedulerContainer.current) {
-        scheduler.init(schedulerContainer.current, new Date(), "week");
-
         scheduler.config.lightbox.sections = [
           {
             name: "description",
@@ -58,23 +57,6 @@ const Scheduler: React.FC = () => {
         });
 
         // Load initial events
-        scheduler.parse(
-          [
-            {
-              id: 1,
-              start_date: "2024-08-15 09:00",
-              end_date: "2024-08-15 12:00",
-              text: "Event 1",
-            },
-            {
-              id: 2,
-              start_date: "2024-08-16 10:00",
-              end_date: "2024-08-16 16:00",
-              text: "Event 2",
-            },
-          ],
-          "json"
-        );
 
         // Export functionality
         scheduler.plugins({ export_api: true });
@@ -110,6 +92,11 @@ const Scheduler: React.FC = () => {
         document
           .querySelector(".controls [name='png']")
           ?.addEventListener("click", () => exportScheduler("png"));
+
+        scheduler.init(schedulerContainer.current, new Date(), "week");
+
+        scheduler.parse(events, "json");
+        console.log("events ==========>>>>>>>>>>>>>", events);
       }
     };
 
