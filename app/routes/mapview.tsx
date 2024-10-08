@@ -6,30 +6,37 @@ import { events, mapEvents } from "../lib/data"; // Import event data
 const Scheduler: React.FC = () => {
   const [toggle, setToggle] = useState<boolean>(false);
   const schedulerContainer = useRef<HTMLDivElement>(null);
+  const [mapsLoaded, setMapsLoaded] = useState(false);
 
-  // useEffect(() => {
-  //   async function maplib() {}
+  // to laod map first so it will not break the code
+  useEffect(() => {
+    const loadMapsScript = async () => {
+      if ((window as any).google && (window as any).google.maps) {
+        setMapsLoaded(true);
+        return;
+      }
 
-  //   maplib();
-  // }, []);
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBVpjUB1Fvop_OWa9OzefIs7LP5gAisWq4`;
+      script.async = true;
+      script.defer = true;
+
+      script.onload = () => setMapsLoaded(true);
+      script.onerror = (e) => console.error("Error loading Google Maps:", e);
+
+      document.head.appendChild(script);
+    };
+
+    loadMapsScript();
+  }, []);
 
   useEffect(() => {
     const loadScheduler = async () => {
+      if (!mapsLoaded) return;
+
       const scheduler: any = (await import("dhtmlx-scheduler")).default;
 
-      await new Promise<void>((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBVpjUB1Fvop_OWa9OzefIs7LP5gAisWq4&libraries=places`;
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-
-        script.onload = () => resolve();
-        script.onerror = (e) => reject(e);
-      });
-
       // Load Google Maps API first
-      scheduler.parse(mapEvents, "json");
 
       // Set scheduler skin based on toggle state
       scheduler.skin = toggle ? "dark" : "flat";
@@ -83,20 +90,9 @@ const Scheduler: React.FC = () => {
       });
 
       // Load the script of google map
-      await new Promise<void>((resolve) => {
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAOXA_S8oo49DSr9CduSTDFjLSE7rO1KqU`;
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-        script.onload = () => resolve();
-      });
 
       // Scheduler initialization
       if (schedulerContainer.current) {
-        scheduler.init(schedulerContainer.current, new Date(), "month");
-        scheduler.parse(events, "json");
-
         // display diffrent colors of event
         scheduler.templates.event_class = function (
           start: any,
@@ -119,7 +115,7 @@ const Scheduler: React.FC = () => {
         ];
 
         // Load the event data
-        scheduler.parse(mapEvents, "json");
+        // scheduler.parse(mapEvents, "json");
 
         // Ensure the custom form block is defined before being used in lightbox sections
         scheduler.plugins({
@@ -452,6 +448,8 @@ const Scheduler: React.FC = () => {
         // "AIzaSyBVpjUB1Fvop_OWa9OzefIs7LP5gAisWq4"; // developer purpose only
         // "AIzaSyAOXA_S8oo49DSr9CduSTDFjLSE7rO1KqU"; live api key
       }
+      scheduler.init(schedulerContainer.current, new Date(), "map");
+      scheduler.parse(events, "json");
     };
 
     loadScheduler();
@@ -461,10 +459,10 @@ const Scheduler: React.FC = () => {
         module.default.clearAll()
       );
     };
-  }, [toggle]);
+  }, [mapsLoaded]);
 
   return (
-    <>
+    <div>
       <div className="controls w-full justify-center items-center flex gap-4">
         <div className="controls_buttons export-btn">
           <input
